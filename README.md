@@ -1,9 +1,9 @@
 # MongoDB
 
-Projeto para apresentar a usabilidade do MongoDB:
+## Projeto para apresentar a usabilidade do MongoDB:
 
 - Todas as execuções de um CRUD
-- Generic Mongo Repository pattern implemented in .NET Core.
+- Padrão genérico do repositório Mongo implementado no .NET Core.
 
 ## Como executar o projeto
 
@@ -12,7 +12,7 @@ Projeto para apresentar a usabilidade do MongoDB:
 - Rode este comando no seu terminal do docker:
 
    ```xml
-    docker run --name mongo-db -d mongo:latest
+   docker run --name mongo-db -d mongo:latest
    ```
 
 - Caso você tenha um servidor do mongo ou database diferente, deve alterar os valores no seu appsettings.json:
@@ -21,7 +21,8 @@ Projeto para apresentar a usabilidade do MongoDB:
     ```xml
     "NoSQLConnection": "mongodb://localhost:17017/?safe=true",
     "NoSQLDataBaseName": "mongodb-workshop",
-   ```
+    ```
+
 ### Referência: https://medium.com/@marekzyla95/mongo-repository-pattern-700986454a0e
 
 
