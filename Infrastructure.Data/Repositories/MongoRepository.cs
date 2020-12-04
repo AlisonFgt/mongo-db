@@ -15,9 +15,8 @@ namespace Infrastructure.Data.Repositories
 
         public MongoRepository(IConfiguration configuration)
         {
-            var mongoConnectionString = configuration.GetSection("NoSQLConnection");
-            var dataBaseName = configuration.GetSection("NoSQLDataBaseName");
-            var database = new MongoClient("mongodb://localhost:17017/?safe=true").GetDatabase("mongo-workshop");
+            var database = new MongoClient(configuration.GetSection("NoSQLConnection").Value)
+                            .GetDatabase(configuration.GetSection("NoSQLDataBaseName").Value);
             _collection = database.GetCollection<TDocument>(typeof(TDocument).Name);
         }
 
