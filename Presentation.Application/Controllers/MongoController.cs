@@ -3,6 +3,7 @@ using Infrastructure.Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Presentation.Application.Controllers
 {
@@ -31,12 +32,41 @@ namespace Presentation.Application.Controllers
         [HttpGet("InsertData")]
         public void InsertData()
         {
-            User user = CreateUser();
+            User user = CreateUser(0);
 
             _userMongoRepository.InsertOne(user);
         }
 
-        private User CreateUser()
+        [HttpGet("InsertData/{id}")]
+        public void InsertDataId(int id)
+        {
+            User user = CreateUser(id);
+
+            _userMongoRepository.InsertOne(user);
+        }
+
+        [HttpGet("InsertManyValues")]
+        public void InsertManyValues()
+        {
+            var listUsers = new List<User>();
+
+            for (int i = 1; i < 1000; i++)
+            {
+                listUsers.Add(CreateUser(i));
+            }
+
+            _userMongoRepository.InsertMany(listUsers);
+        }
+
+        [HttpGet("GetCollection/{Name}")]
+        public User GetCollection(string name)
+        {
+            var user = _userMongoRepository.FilterBy(filter => filter.FirstName == name).FirstOrDefault();
+
+            return user;
+        }
+
+        private User CreateUser(int id)
         {
             var phones = new List<Phone>();
             phones.Add(new Phone
@@ -90,9 +120,14 @@ namespace Presentation.Application.Controllers
                 Cards = cards
             });
 
+            string nome = "Alison";
+
+            if (id > 0)
+                nome = nome + id.ToString();
+
             return new User
             {
-                FirstName = "Alison",
+                FirstName = nome,
                 LastName = "Alves",
                 Phones = phones,
                 BirthDate = new DateTime(1989, 10, 10),

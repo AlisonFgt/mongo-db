@@ -12,10 +12,14 @@ namespace Domain.Model
 
         public DateTime BirthDate { get; set; }
 
-        public IEnumerable<Address> Addresses { get; set; }
+        public ICollection<Address> Addresses { get; set; }
 
-        public IEnumerable<Phone> Phones { get; set; }
+        public ICollection<Phone> Phones { get; set; }
 
-        public IEnumerable<DigitalAccount> DigitalAccounts { get; set; }
+        public ICollection<DigitalAccount> DigitalAccounts { get; set; }
+
+        public bool Active { get; set; }
+
+        public string NewField { get; set; }
     }
 }

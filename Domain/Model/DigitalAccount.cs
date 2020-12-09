@@ -16,7 +16,7 @@ namespace Domain.Model
 
         public bool Active { get; set; }
 
-        public IEnumerable<Card> Cards { get; set; }
+        public ICollection<Card> Cards { get; set; }
 
         public DateTime CreatedAt { get; set; }
     }
