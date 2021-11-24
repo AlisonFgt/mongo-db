@@ -11,76 +11,79 @@ namespace Presentation.Application.Controllers
     [Route("[controller]")]
     public class MongoController : ControllerBase
     {
+        private readonly IMongoRepository<Car> _carMongoRepository;
         private readonly IMongoRepository<User> _userMongoRepository;
 
-        public MongoController(IMongoRepository<User> userMongoRepository)
+        public MongoController(IMongoRepository<User> userMongoRepository, IMongoRepository<Car> carMongoRepository)
         {
             _userMongoRepository = userMongoRepository;
+            _carMongoRepository = carMongoRepository;
         }
 
-        [HttpGet("GetUserData")]
-        public IEnumerable<string> GetUserData()
+        [HttpGet("GetUser/{id}")]
+        public User GetUser(int id)
         {
-            var user = _userMongoRepository.FilterBy(
-                filter => filter.FirstName != "teste",
-                projection => projection.FirstName
-            );
-
+            var user = _userMongoRepository.FilterBy(filter => filter.Uuid.Equals(id.ToString())).FirstOrDefault();
             return user;
         }
 
-        [HttpGet("InsertData")]
-        public void InsertData()
+        [HttpPost("InsertDefaultUser")]
+        public void InsertDefaultUser()
         {
             User user = CreateUser(0);
-
             _userMongoRepository.InsertOne(user);
         }
 
-        [HttpGet("InsertData/{id}")]
+        [HttpPost("InsertDefaultCar/{cor}")]
+        public void InsertDefaultCar(string cor)
+        {
+            Car car = new Car { Cor = cor , Portas = 4 };
+            _carMongoRepository.InsertOne(car);
+        }
+
+        [HttpPost("InsertData/{id}")]
         public void InsertDataId(int id)
         {
             User user = CreateUser(id);
-
             _userMongoRepository.InsertOne(user);
         }
 
-        [HttpGet("InsertManyValues")]
-        public void InsertManyValues()
+        [HttpPost("InsertManyUsers/{qtd}")]
+        public object InsertManyValues(int qtd)
         {
             var listUsers = new List<User>();
 
-            for (int i = 1; i < 1000; i++)
+            if (qtd == 0)
+                qtd = 1;
+
+            for (int i = 1; i < qtd; i++)
             {
                 listUsers.Add(CreateUser(i));
             }
 
             _userMongoRepository.InsertMany(listUsers);
+
+            return Ok("DONE");
         }
 
-        [HttpGet("GetCollection/{Name}")]
-        public User GetCollection(string name)
+        [HttpGet("GetDocuments/{collection}")]
+        public object GetCollection(string collection)
         {
-            var user = _userMongoRepository.FilterBy(filter => filter.FirstName == name).FirstOrDefault();
+            if (collection.ToLower().Equals("user"))
+            {
+                return _userMongoRepository.FilterBy(filter => filter.FirstName != null).ToList();
+            }                
+            else if (collection.ToLower().Equals("car"))
+            {
+                return _carMongoRepository.FilterBy(filter => filter.Cor != null).ToList();
+            }                
 
-            return user;
+            return BadRequest("COLLECTION_NOT_FOUND");
         }
 
         private User CreateUser(int id)
         {
-            var phones = new List<Phone>();
-            phones.Add(new Phone
-            {
-                Number = "999999999",
-                DDD = "51",
-                PhoneType = "Mobile"
-            });
-            phones.Add(new Phone
-            {
-                Number = "30554812",
-                DDD = "51",
-                PhoneType = "Residential"
-            });
+            List<Phone> phones = CreatePhones();
 
             var address = new List<Address>();
             address.Add(new Address
@@ -92,7 +95,38 @@ namespace Presentation.Application.Controllers
                 Number = 99
             });
 
+            List<Card> cards = CreateCards();
+
+            var digitalAccounts = new List<DigitalAccount>();
+            digitalAccounts.Add(new DigitalAccount
+            {
+                AccountName = "DBServer Account",
+                Description = "Workshop",
+                Active = true,
+                Cards = cards
+            });
+
+            string nome = "Alison";
+
+            if (id > 0)
+                nome = nome + " - " + id.ToString();
+
+            return new User
+            {
+                FirstName = nome,
+                Uuid = id.ToString(),
+                LastName = "Alves",
+                Phones = phones,
+                BirthDate = new DateTime(1989, 10, 10),
+                Addresses = address,
+                DigitalAccounts = digitalAccounts
+            };
+        }
+
+        private static List<Card> CreateCards()
+        {
             var cards = new List<Card>();
+
             cards.Add(new Card
             {
                 Number = 545151515,
@@ -111,29 +145,28 @@ namespace Presentation.Application.Controllers
                 VirtualCard = true
             });
 
-            var digitalAccounts = new List<DigitalAccount>();
-            digitalAccounts.Add(new DigitalAccount
+            return cards;
+        }
+
+        private static List<Phone> CreatePhones()
+        {
+            var phones = new List<Phone>();
+
+            phones.Add(new Phone
             {
-                AccountName = "DBServer Account",
-                Description = "Workshop",
-                Active = true,
-                Cards = cards
+                Number = "999999999",
+                DDD = "51",
+                PhoneType = "Mobile"
             });
 
-            string nome = "Alison";
-
-            if (id > 0)
-                nome = nome + id.ToString();
-
-            return new User
+            phones.Add(new Phone
             {
-                FirstName = nome,
-                LastName = "Alves",
-                Phones = phones,
-                BirthDate = new DateTime(1989, 10, 10),
-                Addresses = address,
-                DigitalAccounts = digitalAccounts
-            };
+                Number = "30554812",
+                DDD = "51",
+                PhoneType = "Residential"
+            });
+
+            return phones;
         }
     }
 }

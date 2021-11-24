@@ -18,8 +18,6 @@ namespace Domain.Model
 
         public ICollection<DigitalAccount> DigitalAccounts { get; set; }
 
-        public bool Active { get; set; }
-
-        public string NewField { get; set; }
+        //public bool Active { get; set; }
     }
 }

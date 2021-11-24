@@ -12,14 +12,14 @@
 - Rode este comando no seu terminal do docker:
 
    ```xml
-   docker run --name mongo-db -d mongo:latest
+   docker run --name mongo-db -p 27017:27017 -d mongo:latest
    ```
 
 - Caso você tenha um servidor do mongo ou database diferente, deve alterar os valores no seu appsettings.json:
 
     Exemplo:
     ```xml
-    "NoSQLConnection": "mongodb://localhost:17017/?safe=true",
+    "NoSQLConnection": "mongodb://localhost:27017/?safe=true",
     "NoSQLDataBaseName": "mongodb-workshop",
     ```
 
